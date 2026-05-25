@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Acompanhamento Psicossocial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'vibrant-green': '#56D500',
+                        'dark-blue': '#00314E',
+                        'capri-blue': '#01BEFF'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #00314E 0%, #01BEFF 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(0, 49, 78, 0.1);
+        }
+        .question-card {
+            transition: all 0.3s ease;
+        }
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 49, 78, 0.15);
+        }
+        .radio-custom {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #01BEFF;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+        }
+        .radio-custom:checked {
+            background-color: #56D500;
+            border-color: #56D500;
+        }
+        .radio-custom:checked::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-6 px-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <!-- Logo with white round background -->
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                    <img src="https://logosdown.com/wp-content/uploads/2023/08/bayer-logo-0-1536x1536.png" alt="Bayer Logo" class="w-10 h-10 rounded-full" onerror="this.src=''; this.alt='Logo não disponível'; this.style.display='none';">
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold" id="main-title">Ficha de Acompanhamento Psicossocial</h1>
+                </div>
+            </div>
+            
+            <!-- Language Toggle -->
+            <div class="flex space-x-2">
+                <button onclick="setLanguage('pt')" id="btn-pt" class="px-4 py-2 bg-vibrant-green text-white rounded-lg font-semibold transition-all hover:bg-green-600">PT</button>
+                <button onclick="setLanguage('es')" id="btn-es" class="px-4 py-2 bg-white text-dark-blue rounded-lg font-semibold transition-all hover:bg-gray-100">ES</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-xl card-shadow p-4 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-dark-blue font-semibold" id="progress-text">Seção 1 de 5</span>
+                <span class="text-dark-blue font-semibold" id="progress-percent">20%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-gradient-to-r from-capri-blue to-vibrant-green h-3 rounded-full transition-all duration-500" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Section 1: Personal Info + SRQ-20 -->
+        <div id="section-1" class="section bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-dark-blue mb-6" id="personal-info-title">Seção 1: Dados Pessoais e SRQ-20</h2>
+            
+            <!-- Personal Data -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-dark-blue font-semibold mb-2" id="name-label">Nome Completo:</label>
+                    <input type="text" class="w-full p-4 border-2 border-capri-blue rounded-lg focus:border-vibrant-green outline-none transition-colors" id="name-input" placeholder="Digite seu nome completo">
+                </div>
+                <div>
+                    <label class="block text-dark-blue font-semibold mb-2" id="birth-label">Data de Nascimento:</label>
+                    <input type="date" class="w-full p-4 border-2 border-capri-blue rounded-lg focus:border-vibrant-green outline-none transition-colors" id="birth-input">
+                </div>
+            </div>
+
+            <!-- SRQ-20 Questions -->
+            <div class="border-t pt-6">
+                <h3 class="text-xl font-bold text-dark-blue mb-4" id="srq-subtitle">SRQ-20</h3>
+                <p class="text-gray-600 mb-6" id="srq-description">As questões estão relacionadas a dores e problemas que podem ter incomodado nos últimos 30 dias.</p>
+                
+                <div class="space-y-4" id="srq-questions">
+                    <!-- SRQ questions will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Sleep Quality -->
+        <div id="section-2" class="section hidden bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-dark-blue mb-4" id="sleep-title">Seção 2: Avaliação da Qualidade do Sono</h2>
+            <p class="text-gray-600 mb-6" id="sleep-description">Responda SIM ou NÃO</p>
+            
+            <div class="space-y-4" id="sleep-questions">
+                <!-- Sleep questions will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Section 3: Fatigue Scale -->
+        <div id="section-3" class="section hidden bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-dark-blue mb-4" id="fatigue-title">Seção 3: Escala de Fadiga (CHALDER)</h2>
+            <p class="text-gray-600 mb-6" id="fatigue-description">Marque de acordo com as últimas semanas</p>
+            
+            <div class="space-y-4" id="fatigue-questions">
+                <!-- Fatigue questions will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Section 4: AUDIT -->
+        <div id="section-4" class="section hidden bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-dark-blue mb-4" id="audit-title">Seção 4: Escala de Uso de Álcool (AUDIT)</h2>
+            <p class="text-gray-600 mb-6" id="audit-description">Marque a opção mais adequada</p>
+            
+            <div class="space-y-4" id="audit-questions">
+                <!-- AUDIT questions will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Section 5: Phobias and Fears -->
+        <div id="section-5" class="section hidden bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold text-dark-blue mb-4" id="phobia-title">Seção 5: Fobias e Medos</h2>
+            <p class="text-gray-600 mb-6" id="phobia-description">Responda SIM ou NÃO</p>
+            
+            <div class="space-y-4" id="phobia-questions">
+                <!-- Phobia questions will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center">
+            <button id="prev-btn" onclick="previousSection()" class="hidden bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-all">
+                ← <span id="prev-text">Anterior</span>
+            </button>
+            
+            <div class="flex-1"></div>
+            
+            <button id="next-btn" onclick="nextSection()" class="bg-vibrant-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-all">
+                <span id="next-text">Próxima</span> →
+            </button>
+            
+            <button id="submit-btn" onclick="calculateResults()" class="hidden bg-dark-blue text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-900 transition-all transform hover:scale-105 shadow-lg">
+                <span id="submit-text">Calcular Resultados</span>
+            </button>
+        </div>
+
+        <!-- Results Modal -->
+        <div id="results-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeResultsModal()">×</button>
+                <div class="p-4">
+                    <h2 class="text-xl font-bold text-dark-blue mb-4 text-center" id="results-title">Resultados da Avaliação</h2>
+                    <div id="results-content" class="space-y-6">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'pt';
+        let currentSection = 1;
+        const totalSections = 5;
+        
+        const translations = {
+            pt: {
+                mainTitle: "Ficha de Acompanhamento Psicossocial",
+                personalInfoTitle: "Seção 1: Dados Pessoais e SRQ-20",
+                nameLabel: "Nome Completo:",
+                birthLabel: "Data de Nascimento:",
+                srqSubtitle: "SRQ-20",
+                srqDescription: "As questões estão relacionadas a dores e problemas que podem ter incomodado nos últimos 30 dias.",
+                sleepTitle: "Seção 2: Avaliação da Qualidade do Sono",
+                sleepDescription: "Responda SIM ou NÃO",
+                fatigueTitle: "Seção 3: Escala de Fadiga (CHALDER)",
+                fatigueDescription: "Marque de acordo com as últimas semanas",
+                auditTitle: "Seção 4: Escala de Uso de Álcool (AUDIT)",
+                auditDescription: "Marque a opção mais adequada",
+                phobiaTitle: "Seção 5: Fobias e Medos",
+                phobiaDescription: "Responda SIM ou NÃO",
+                resultsTitle: "Resultados da Avaliação",
+                nextText: "Próxima",
+                prevText: "Anterior",
+                submitText: "Calcular Resultados",
+                progressText: "Seção",
+                yes: "SIM",
+                no: "NÃO",
+                never: "Nunca",
+                rarely: "Raramente",
+                sometimes: "Às vezes",
+                always: "Sempre",
+                srqQuestions: [
+                    "Tem dores de cabeça, frequentes?",
+                    "Tem falta de apetite?",
+                    "Dorme mal?",
+                    "Assusta-se com facilidade?",
+                    "Tem tremores nas mãos?",
+                    "Sente-se nervoso(a), tenso(a) ou preocupado(a)?",
+                    "Tem má digestão?",
+                    "Dificuldade de pensar com clareza?",
+                    "Tem se sentido triste ultimamente?",
+                    "Chora mais do que o de costume?",
+                    "Dificuldade para realizar atividades diárias com satisfação?",
+                    "Dificuldade para tomar decisões?",
+                    "Dificuldade no trabalho (penoso, causa sofrimento)?",
+                    "Incapaz de desempenhar papel útil na vida?",
+                    "Tem perdido o interesse pelas coisas?",
+                    "Sente-se inútil, sem préstimo?",
+                    "Já teve ideia de acabar com a vida?",
+                    "Sente-se cansado(a) o tempo todo?",
+                    "Cansa-se com facilidade?",
+                    "Sensações desagradáveis no estômago?"
+                ],
+                sleepQuestions: [
+                    "Seu sono é agitado/inquieto?",
+                    "Sente-se cansado(a) durante o dia a ponto de prejudicar atenção/rendimento?",
+                    "Já sofreu ou quase sofreu acidente por dormir pouco?",
+                    "Dorme mais nos finais de semana?"
+                ],
+                fatigueQuestions: [
+                    "Eu me cansei facilmente",
+                    "Precisei descansar mais",
+                    "Estive sonolento",
+                    "Não consegui iniciar minhas atividades",
+                    "Estive com falta de ânimo",
+                    "Senti menos força nos músculos",
+                    "Me senti fraco",
+                    "Tive problemas de concentração",
+                    "Tive dificuldades para pensar claramente",
+                    "Tive dificuldade de encontrar a palavra certa",
+                    "Tive problemas de memória"
+                ],
+                auditQuestions: [
+                    "Freq. de consumo de bebidas alcoólicas",
+                    "Nº de doses por ocasião",
+                    "\"Seis ou mais doses\" em uma ocasião",
+                    "Não conseguiu parar de beber",
+                    "Deixou de fazer algo por beber",
+                    "Bebeu de manhã para se sentir melhor",
+                    "Sentiu culpa/remorso por beber",
+                    "Não lembra do que aconteceu após beber",
+                    "Alguém já se machucou por você ter bebido?",
+                    "Alguém já sugeriu que diminuísse?"
+                ],
+                phobiaQuestions: [
+                    "Tem fobia de altura?",
+                    "Tem fobia de espaços fechados/confinados?",
+                    "Já foi diagnosticado com doença mental/psiquiátrica?",
+                    "Faz uso de medicamentos controlados?",
+                    "Tem ou já teve convulsão/epilepsia?",
+                    "Já teve algum desmaio?",
+                    "Já sofreu queda de altura e/ou trauma na cabeça?",
+                    "Tem ou já teve tontura/labirintite?",
+                    "Sente falta de ar, cansaço, tontura ou dor no peito com esforço físico?"
+                ],
+                // Results translations
+                patient: "Paciente",
+                name: "Nome",
+                birthDate: "Data de Nascimento",
+                evaluationDate: "Data da Avaliação",
+                howItWorks: "✔️ Como funciona:",
+                interpretation: "✔️ Interpretação:",
+                sleepQuality: "Qualidade do Sono",
+                fatigueScale: "Escala de Fadiga (Chalder)",
+                phobiasAndFears: "Fobias e Medos",
+                sendResultButton: "📄 Envie o print do resultado aqui",
+                hideContactButton: "📄 Ocultar informações de contato",
+                helpTitle: "Precisa de ajuda com o resultado?",
+                helpDescription: "Se você sentir necessidade de orientação ou suporte emocional. Tire um print da tela e envie o resultado para a Saúde Ocupacional:",
+                whatsapp: "WhatsApp:",
+                email: "E-mail/Teams:",
+                validationButton: "📋 Validação Institucional",
+                validationTitle: "Validação Institucional",
+                validationDescription: "Este questionário foi aprovado pela equipe de Saúde Ocupacional da Bayer. Os parâmetros para interpretação do resultado foram avaliados e aprovados pela Médica do Trabalho Dra. Natália Moro.",
+                doctorName: "Dra. Natália Moro",
+                doctorTitle: "Médica do Trabalho",
+                companyName: "Bayer de Sorriso - MT",
+                signatureNotAvailable: "Assinatura não disponível"
+            },
+            es: {
+                mainTitle: "Ficha de Seguimiento Psicosocial",
+                personalInfoTitle: "Sección 1: Datos Personales y SRQ-20",
+                nameLabel: "Nombre Completo:",
+                birthLabel: "Fecha de Nacimiento:",
+                srqSubtitle: "SRQ-20",
+                srqDescription: "Las preguntas están relacionadas con dolores y problemas que pueden haber molestado en los últimos 30 días.",
+                sleepTitle: "Sección 2: Evaluación de la Calidad del Sueño",
+                sleepDescription: "Responda SÍ o NO",
+                fatigueTitle: "Sección 3: Escala de Fatiga (CHALDER)",
+                fatigueDescription: "Marque según las últimas semanas",
+                auditTitle: "Sección 4: Escala de Uso de Alcohol (AUDIT)",
+                auditDescription: "Marque la opción más adecuada",
+                phobiaTitle: "Sección 5: Fobias y Miedos",
+                phobiaDescription: "Responda SÍ o NO",
+                resultsTitle: "Resultados de la Evaluación",
+                nextText: "Siguiente",
+                prevText: "Anterior",
+                submitText: "Calcular Resultados",
+                progressText: "Sección",
+                yes: "SÍ",
+                no: "NO",
+                never: "Nunca",
+                rarely: "Raramente",
+                sometimes: "A veces",
+                always: "Siempre",
+                srqQuestions: [
+                    "¿Tiene dolores de cabeza frecuentes?",
+                    "¿Tiene falta de apetito?",
+                    "¿Duerme mal?",
+                    "¿Se asusta con facilidad?",
+                    "¿Tiene temblores en las manos?",
+                    "¿Se siente nervioso(a), tenso(a) o preocupado(a)?",
+                    "¿Tiene mala digestión?",
+                    "¿Dificultad para pensar con claridad?",
+                    "¿Se ha sentido triste últimamente?",
+                    "¿Llora más de lo habitual?",
+                    "¿Dificultad para realizar actividades diarias con satisfacción?",
+                    "¿Dificultad para tomar decisiones?",
+                    "¿Dificultad en el trabajo (penoso, causa sufrimiento)?",
+                    "¿Incapaz de desempeñar un papel útil en la vida?",
+                    "¿Ha perdido el interés por las cosas?",
+                    "¿Se siente inútil, sin valor?",
+                    "¿Ha tenido ideas de acabar con su vida?",
+                    "¿Se siente cansado(a) todo el tiempo?",
+                    "¿Se cansa con facilidad?",
+                    "¿Sensaciones desagradables en el estómago?"
+                ],
+                sleepQuestions: [
+                    "¿Su sueño es agitado/inquieto?",
+                    "¿Se siente cansado(a) durante el día hasta el punto de perjudicar la atención/rendimiento?",
+                    "¿Ya sufrió o casi sufrió un accidente por dormir poco?",
+                    "¿Duerme más los fines de semana?"
+                ],
+                fatigueQuestions: [
+                    "Me cansé fácilmente",
+                    "Necesité descansar más",
+                    "Estuve somnoliento",
+                    "No pude iniciar mis actividades",
+                    "Estuve sin ánimo",
+                    "Sentí menos fuerza en los músculos",
+                    "Me sentí débil",
+                    "Tuve problemas de concentración",
+                    "Tuve dificultades para pensar claramente",
+                    "Tuve dificultad para encontrar la palabra correcta",
+                    "Tuve problemas de memoria"
+                ],
+                auditQuestions: [
+                    "Freq. de consumo de bebidas alcohólicas",
+                    "Nº de dosis por ocasión",
+                    "\"Seis o más dosis\" en una ocasión",
+                    "No pudo parar de beber",
+                    "Dejó de hacer algo por beber",
+                    "Bebió por la mañana para sentirse mejor",
+                    "Sintió culpa/remordimiento por beber",
+                    "No recuerda lo que pasó después de beber",
+                    "¿Alguien ya se lastimó porque usted bebió?",
+                    "¿Alguien ya sugirió que disminuyera?"
+                ],
+                phobiaQuestions: [
+                    "¿Tiene fobia a las alturas?",
+                    "¿Tiene fobia a espacios cerrados/confinados?",
+                    "¿Ya fue diagnosticado con enfermedad mental/psiquiátrica?",
+                    "¿Hace uso de medicamentos controlados?",
+                    "¿Tiene o ya tuvo convulsión/epilepsia?",
+                    "¿Ya tuvo algún desmayo?",
+                    "¿Ya sufrió caída de altura y/o trauma en la cabeza?",
+                    "¿Tiene o ya tuvo mareo/laberintitis?",
+                    "¿Siente falta de aire, cansancio, mareo o dolor en el pecho con esfuerzo físico?"
+                ],
+                // Results translations
+                patient: "Paciente",
+                name: "Nombre",
+                birthDate: "Fecha de Nacimiento",
+                evaluationDate: "Fecha de Evaluación",
+                howItWorks: "✔️ Cómo funciona:",
+                interpretation: "✔️ Interpretación:",
+                sleepQuality: "Calidad del Sueño",
+                fatigueScale: "Escala de Fatiga (Chalder)",
+                phobiasAndFears: "Fobias y Miedos",
+                sendResultButton: "📄 Enviar captura del resultado aquí",
+                hideContactButton: "📄 Ocultar información de contacto",
+                helpTitle: "¿Necesita ayuda con el resultado?",
+                helpDescription: "Si siente necesidad de orientación o apoyo emocional. Tome una captura de pantalla y envíe el resultado a Salud Ocupacional:",
+                whatsapp: "WhatsApp:",
+                email: "E-mail/Teams:",
+                validationButton: "📋 Validación Institucional",
+                validationTitle: "Validación Institucional",
+                validationDescription: "Este cuestionario fue aprobado por el equipo de Salud Ocupacional de Bayer. Los parámetros para interpretación del resultado fueron evaluados y aprobados por la Médica del Trabajo Dra. Natália Moro.",
+                doctorName: "Dra. Natália Moro",
+                doctorTitle: "Médica del Trabajo",
+                companyName: "Bayer de Sorriso - MT",
+                signatureNotAvailable: "Firma no disponible"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update button states
+            document.getElementById('btn-pt').className = lang === 'pt' ? 
+                'px-4 py-2 bg-vibrant-green text-white rounded-lg font-semibold transition-all hover:bg-green-600' :
+                'px-4 py-2 bg-white text-dark-blue rounded-lg font-semibold transition-all hover:bg-gray-100';
+            
+            document.getElementById('btn-es').className = lang === 'es' ? 
+                'px-4 py-2 bg-vibrant-green text-white rounded-lg font-semibold transition-all hover:bg-green-600' :
+                'px-4 py-2 bg-white text-dark-blue rounded-lg font-semibold transition-all hover:bg-gray-100';
+            
+            updateContent();
+        }
+
+        function updateContent() {
+            const t = translations[currentLanguage];
+            
+            // Update static text
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('personal-info-title').textContent = t.personalInfoTitle;
+            document.getElementById('name-label').textContent = t.nameLabel;
+            document.getElementById('birth-label').textContent = t.birthLabel;
+            document.getElementById('srq-subtitle').textContent = t.srqSubtitle;
+            document.getElementById('srq-description').textContent = t.srqDescription;
+            document.getElementById('sleep-title').textContent = t.sleepTitle;
+            document.getElementById('sleep-description').textContent = t.sleepDescription;
+            document.getElementById('fatigue-title').textContent = t.fatigueTitle;
+            document.getElementById('fatigue-description').textContent = t.fatigueDescription;
+            document.getElementById('audit-title').textContent = t.auditTitle;
+            document.getElementById('audit-description').textContent = t.auditDescription;
+            document.getElementById('phobia-title').textContent = t.phobiaTitle;
+            document.getElementById('phobia-description').textContent = t.phobiaDescription;
+            document.getElementById('results-title').textContent = t.resultsTitle;
+            document.getElementById('next-text').textContent = t.nextText;
+            document.getElementById('prev-text').textContent = t.prevText;
+            document.getElementById('submit-text').textContent = t.submitText;
+            
+            // Update placeholder text
+            const nameInput = document.getElementById('name-input');
+            if (nameInput) {
+                nameInput.placeholder = currentLanguage === 'pt' ? 'Digite seu nome completo' : 'Escriba su nombre completo';
+            }
+            
+            updateProgressBar();
+            
+            // Generate questions
+            generateSRQQuestions();
+            generateSleepQuestions();
+            generateFatigueQuestions();
+            generateAuditQuestions();
+            generatePhobiaQuestions();
+            
+            // Update validation button in results if modal is open
+            updateValidationButtonInResults();
+        }
+
+        function nextSection() {
+            if (currentSection < totalSections) {
+                document.getElementById(`section-${currentSection}`).classList.add('hidden');
+                currentSection++;
+                document.getElementById(`section-${currentSection}`).classList.remove('hidden');
+                updateProgressBar();
+                updateNavigationButtons();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 1) {
+                document.getElementById(`section-${currentSection}`).classList.add('hidden');
+                currentSection--;
+                document.getElementById(`section-${currentSection}`).classList.remove('hidden');
+                updateProgressBar();
+                updateNavigationButtons();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function updateProgressBar() {
+            const t = translations[currentLanguage];
+            const percentage = (currentSection / totalSections) * 100;
+            
+            document.getElementById('progress-text').textContent = `${t.progressText} ${currentSection} de ${totalSections}`;
+            document.getElementById('progress-percent').textContent = `${Math.round(percentage)}%`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // Show/hide previous button
+            if (currentSection > 1) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
+            
+            // Show/hide next/submit buttons
+            if (currentSection === totalSections) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function generateSRQQuestions() {
+            const container = document.getElementById('srq-questions');
+            const t = translations[currentLanguage];
+            
+            container.innerHTML = t.srqQuestions.map((question, index) => `
+                <div class="flex items-start justify-between p-4 bg-gray-50 rounded-lg">
+                    <span class="text-dark-blue font-medium flex-1 pr-4">${index + 1}. ${question}</span>
+                    <div class="flex space-x-6 flex-shrink-0">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="srq${index}" value="1" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.yes}</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="srq${index}" value="0" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.no}</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateSleepQuestions() {
+            const container = document.getElementById('sleep-questions');
+            const t = translations[currentLanguage];
+            
+            container.innerHTML = t.sleepQuestions.map((question, index) => `
+                <div class="flex items-start justify-between p-4 bg-gray-50 rounded-lg">
+                    <span class="text-dark-blue font-medium flex-1 pr-4">${index + 1}. ${question}</span>
+                    <div class="flex space-x-6 flex-shrink-0">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="sleep${index}" value="1" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.yes}</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="sleep${index}" value="0" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.no}</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateFatigueQuestions() {
+            const container = document.getElementById('fatigue-questions');
+            const t = translations[currentLanguage];
+            
+            container.innerHTML = t.fatigueQuestions.map((question, index) => `
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <div class="text-dark-blue font-medium mb-3">${index + 1}. ${question}</div>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="fatigue${index}" value="0" class="radio-custom">
+                            <span class="text-sm text-dark-blue">${t.never} (0)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="fatigue${index}" value="1" class="radio-custom">
+                            <span class="text-sm text-dark-blue">${t.rarely} (1)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="fatigue${index}" value="2" class="radio-custom">
+                            <span class="text-sm text-dark-blue">${t.sometimes} (2)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="fatigue${index}" value="3" class="radio-custom">
+                            <span class="text-sm text-dark-blue">${t.always} (3)</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateAuditQuestions() {
+            const container = document.getElementById('audit-questions');
+            const t = translations[currentLanguage];
+            
+            // Fixed AUDIT options with proper language switching
+            const auditOptions = currentLanguage === 'pt' ? [
+                [t.never, "1x/mês", "2–4x/mês", "2–3x/sem", "4+ x/sem"],
+                ["0", "1-2", "3–4", "5–6", "7–9", "10+"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                [t.never, "Mensal", "Semanal", "Quase diária"],
+                ["Não", "Sim, não no último ano", "Sim, no último ano"],
+                ["Não", "Sim, não no último ano", "Sim, no último ano"]
+            ] : [
+                [t.never, "1x/mes", "2–4x/mes", "2–3x/sem", "4+ x/sem"],
+                ["0", "1-2", "3–4", "5–6", "7–9", "10+"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                [t.never, "Mensual", "Semanal", "Casi diaria"],
+                ["No", "Sí, no en el último año", "Sí, en el último año"],
+                ["No", "Sí, no en el último año", "Sí, en el último año"]
+            ];
+            
+            container.innerHTML = t.auditQuestions.map((question, index) => `
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <div class="text-dark-blue font-medium mb-3">${index + 1}. ${question}</div>
+                    <div class="flex flex-wrap gap-2">
+                        ${auditOptions[index].map((option, optIndex) => 
+                            option ? `
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="radio" name="audit${index}" value="${optIndex}" class="radio-custom">
+                                    <span class="text-sm text-dark-blue">${option}</span>
+                                </label>
+                            ` : ''
+                        ).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generatePhobiaQuestions() {
+            const container = document.getElementById('phobia-questions');
+            const t = translations[currentLanguage];
+            
+            container.innerHTML = t.phobiaQuestions.map((question, index) => `
+                <div class="flex items-start justify-between p-4 bg-gray-50 rounded-lg">
+                    <span class="text-dark-blue font-medium flex-1 pr-4">${index + 1}. ${question}</span>
+                    <div class="flex space-x-6 flex-shrink-0">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="phobia${index}" value="1" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.yes}</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="phobia${index}" value="0" class="radio-custom">
+                            <span class="text-dark-blue font-semibold">${t.no}</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calculateResults() {
+            console.log('Calculate Results clicked!'); // Debug log
+            
+            const name = document.getElementById('name-input').value.trim();
+            const birthDate = document.getElementById('birth-input').value;
+            
+            console.log('Name:', name, 'Birth:', birthDate); // Debug log
+            
+            if (!name || !birthDate) {
+                alert(currentLanguage === 'pt' ? 'Por favor, preencha nome e data de nascimento.' : 'Por favor, complete nombre y fecha de nacimiento.');
+                // Scroll back to section 1 to fill missing data
+                currentSection = 1;
+                document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+                document.getElementById('section-1').classList.remove('hidden');
+                updateProgressBar();
+                updateNavigationButtons();
+                return;
+            }
+            
+            // Calculate SRQ-20 score
+            let srqScore = 0;
+            for (let i = 0; i < 20; i++) {
+                const selected = document.querySelector(`input[name="srq${i}"]:checked`);
+                if (selected) srqScore += parseInt(selected.value);
+            }
+            console.log('SRQ Score:', srqScore);
+            
+            // Calculate Sleep score
+            let sleepScore = 0;
+            for (let i = 0; i < 4; i++) {
+                const selected = document.querySelector(`input[name="sleep${i}"]:checked`);
+                if (selected) sleepScore += parseInt(selected.value);
+            }
+            console.log('Sleep Score:', sleepScore);
+            
+            // Calculate Fatigue score
+            let fatigueScore = 0;
+            for (let i = 0; i < 11; i++) {
+                const selected = document.querySelector(`input[name="fatigue${i}"]:checked`);
+                if (selected) fatigueScore += parseInt(selected.value);
+            }
+            console.log('Fatigue Score:', fatigueScore);
+            
+            // Calculate AUDIT score
+            let auditScore = 0;
+            for (let i = 0; i < 10; i++) {
+                const selected = document.querySelector(`input[name="audit${i}"]:checked`);
+                if (selected) auditScore += parseInt(selected.value);
+            }
+            console.log('AUDIT Score:', auditScore);
+            
+            // Calculate Phobia score
+            let phobiaScore = 0;
+            for (let i = 0; i < 9; i++) {
+                const selected = document.querySelector(`input[name="phobia${i}"]:checked`);
+                if (selected) phobiaScore += parseInt(selected.value);
+            }
+            console.log('Phobia Score:', phobiaScore);
+            
+            // Show results
+            console.log('About to show results...');
+            const resultsModal = document.getElementById('results-modal');
+            const resultsContent = document.getElementById('results-content');
+            console.log('Results modal found:', resultsModal);
+            console.log('Results content found:', resultsContent);
+            
+            if (!resultsModal || !resultsContent) {
+                console.error('Modal elements not found!');
+                alert('Erro ao exibir resultados. Tente novamente.');
+                return;
+            }
+            
+            const isPortuguese = currentLanguage === 'pt';
+            const t = translations[currentLanguage];
+            
+            // Get detailed interpretations
+            const getSRQInterpretation = () => {
+                // Check question 17 (suicidal ideation) - array index 16
+                const question17 = document.querySelector('input[name="srq16"]:checked');
+                const hasSuicidalIdeation = question17 && question17.value === '1';
+                
+                if (hasSuicidalIdeation) {
+                    if (isPortuguese) {
+                        return '🚨 RISCO IMEDIATO - Ideação suicida identificada. Encaminhamento imediato para suporte especializado é recomendado.';
+                    } else {
+                        return '🚨 RIESGO INMEDIATO - Ideación suicida identificada. Se recomienda derivación inmediata a apoyo especializado.';
+                    }
+                }
+                
+                if (isPortuguese) {
+                    return srqScore >= 8 ? 
+                        'Provável sofrimento mental. Recomenda-se avaliação mais detalhada.' :
+                        'Baixo risco de transtornos mentais comuns.';
+                } else {
+                    return srqScore >= 8 ? 
+                        'Probable sufrimiento mental. Se recomienda evaluación más detallada.' :
+                        'Bajo riesgo de trastornos mentales comunes.';
+                }
+            };
+
+            const getSleepInterpretation = () => {
+                // Check specific sleep patterns
+                const sleep0 = document.querySelector('input[name="sleep0"]:checked')?.value === '1'; // Sono agitado
+                const sleep1 = document.querySelector('input[name="sleep1"]:checked')?.value === '1'; // Cansaço durante o dia
+                const sleep2 = document.querySelector('input[name="sleep2"]:checked')?.value === '1'; // Quase acidente
+                const sleep3 = document.querySelector('input[name="sleep3"]:checked')?.value === '1'; // Dorme mais no fim de semana
+                
+                if (isPortuguese) {
+                    if (sleepScore === 0) return 'Sono aparentemente regular e restaurador.';
+                    if (sleepScore === 1 && sleep3) return 'Padrão de sono ajustado à rotina semanal. Não há sinais claros de prejuízo.';
+                    if (sleepScore >= 2) return 'Qualidade do sono insatisfatória. Requer atenção.';
+                    
+                    // Individual detailed interpretations for single YES answers
+                    if (sleepScore === 1) {
+                        if (sleep0) return 'Relato de sono agitado, possivelmente relacionado a estresse ou dificuldade de relaxamento durante o descanso. Recomenda-se avaliação detalhada.';
+                        if (sleep1) return 'Indica que o sono não está sendo restaurador o suficiente, impactando diretamente o desempenho diário. Recomenda-se avaliação detalhada.';
+                        if (sleep2) return 'Relato de risco importante relacionado à privação de sono, com potencial para comprometer a segurança pessoal e ocupacional. Recomenda-se avaliação detalhada.';
+                    }
+                    
+                    return 'Qualidade do sono insatisfatória. Requer atenção.';
+                } else {
+                    if (sleepScore === 0) return 'Sueño aparentemente regular y reparador.';
+                    if (sleepScore === 1 && sleep3) return 'Patrón de sueño ajustado a la rutina semanal. No hay señales claras de perjuicio.';
+                    if (sleepScore >= 2) return 'Calidad del sueño insatisfactoria. Requiere atención.';
+                    
+                    // Individual detailed interpretations for single YES answers
+                    if (sleepScore === 1) {
+                        if (sleep0) return 'Relato de sueño agitado, posiblemente relacionado con estrés o dificultad de relajación durante el descanso. Se recomienda evaluación detallada.';
+                        if (sleep1) return 'Indica que el sueño no está siendo reparador lo suficiente, impactando directamente el rendimiento diario. Se recomienda evaluación detallada.';
+                        if (sleep2) return 'Relato de riesgo importante relacionado con la privación de sueño, con potencial para comprometer la seguridad personal y ocupacional. Se recomienda evaluación detallada.';
+                    }
+                    
+                    return 'Calidad del sueño insatisfactoria. Requiere atención.';
+                }
+            };
+
+            const getFatigueInterpretation = () => {
+                if (isPortuguese) {
+                    if (fatigueScore === 0) return 'Energia em dia! Nenhum sinal de fadiga percebido nas últimas semanas.';
+                    if (fatigueScore >= 1 && fatigueScore <= 11) return 'Sem sinais relevantes de fadiga. Recomenda-se manter a observação da rotina e da qualidade do descanso.';
+                    if (fatigueScore >= 12 && fatigueScore <= 20) return 'Fadiga leve a moderada. É aconselhável revisar os hábitos de sono e incluir pausas ao longo do dia.';
+                    if (fatigueScore >= 21 && fatigueScore <= 33) return 'Atenção! Indícios de fadiga intensa. Sugere-se avaliação clínica e busca por suporte especializado.';
+                } else {
+                    if (fatigueScore === 0) return '¡Energía al día! Ninguna señal de fatiga percibida en las últimas semanas.';
+                    if (fatigueScore >= 1 && fatigueScore <= 11) return 'Sin señales relevantes de fatiga. Se recomienda mantener la observación de la rutina y la calidad del descanso.';
+                    if (fatigueScore >= 12 && fatigueScore <= 20) return 'Fatiga leve a moderada. Es aconsejable revisar los hábitos de sueño e incluir pausas a lo largo del día.';
+                    if (fatigueScore >= 21 && fatigueScore <= 33) return '¡Atención! Indicios de fatiga intensa. Se sugiere evaluación clínica y búsqueda de apoyo especializado.';
+                }
+            };
+
+            const getAuditInterpretation = () => {
+                if (isPortuguese) {
+                    if (auditScore === 0) return 'Ausência de consumo de álcool ou abstinência.';
+                    if (auditScore <= 7) return 'Uso de baixo risco.';
+                    if (auditScore <= 15) return 'Uso de risco. Recomenda-se avaliação mais detalhada.';
+                    return 'Uso nocivo/possível dependência. Recomenda-se avaliação mais detalhada.';
+                } else {
+                    if (auditScore === 0) return 'Ausencia de consumo de alcohol o abstinencia.';
+                    if (auditScore <= 7) return 'Uso de bajo riesgo.';
+                    if (auditScore <= 15) return 'Uso de riesgo. Se recomienda evaluación más detallada.';
+                    return 'Uso nocivo/posible dependencia. Se recomienda evaluación más detallada.';
+                }
+            };
+
+            resultsContent.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-3 mb-4">
+                    <div class="bg-gradient-to-r from-capri-blue to-vibrant-green text-white p-3 rounded-lg">
+                        <h3 class="text-sm font-bold mb-1">${t.patient}</h3>
+                        <p class="text-xs"><strong>${t.name}:</strong> ${name}</p>
+                        <p class="text-xs"><strong>${t.birthDate}:</strong> ${birthDate}</p>
+                    </div>
+                    
+                    <div class="bg-dark-blue text-white p-3 rounded-lg">
+                        <h3 class="text-sm font-bold mb-1">${t.evaluationDate}</h3>
+                        <p class="text-xs">${new Date().toLocaleDateString(isPortuguese ? 'pt-BR' : 'es-ES')}</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- SRQ-20 Results -->
+                    <div class="bg-white border-l-4 ${(() => {
+                        const question17 = document.querySelector('input[name="srq16"]:checked');
+                        const hasSuicidalIdeation = question17 && question17.value === '1';
+                        return hasSuicidalIdeation ? 'border-red-600' : 'border-vibrant-green';
+                    })()} p-3 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-dark-blue">SRQ-20</h4>
+                            <p class="text-xl font-bold ${(() => {
+                                const question17 = document.querySelector('input[name="srq16"]:checked');
+                                const hasSuicidalIdeation = question17 && question17.value === '1';
+                                return hasSuicidalIdeation ? 'text-red-600' : 'text-vibrant-green';
+                            })()} ">${srqScore}/20</p>
+                        </div>
+                        <div class="${(() => {
+                            const question17 = document.querySelector('input[name="srq16"]:checked');
+                            const hasSuicidalIdeation = question17 && question17.value === '1';
+                            return hasSuicidalIdeation ? 'bg-red-50 border-2 border-red-200' : 'bg-gray-50';
+                        })()} p-2 rounded text-xs">
+                            <p class="text-gray-600 mb-1">
+                                <strong>${t.howItWorks}</strong>
+                                ${isPortuguese ? '20 perguntas binária (Sim=1/Não=0).' : '20 preguntas binaria (Sí=1/No=0).'}
+                            </p>
+                            <p class="font-semibold ${(() => {
+                                const question17 = document.querySelector('input[name="srq16"]:checked');
+                                const hasSuicidalIdeation = question17 && question17.value === '1';
+                                return hasSuicidalIdeation ? 'text-red-700' : 'text-dark-blue';
+                            })()}">
+                                <strong>${t.interpretation}</strong> ${getSRQInterpretation()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Sleep Quality Results -->
+                    <div class="bg-white border-l-4 border-capri-blue p-3 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-dark-blue">${t.sleepQuality}</h4>
+                            <p class="text-xl font-bold text-capri-blue">${sleepScore}/4</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs">
+                            <p class="text-gray-600 mb-1">
+                                <strong>${t.howItWorks}</strong>
+                                ${isPortuguese ? '4 perguntas SIM/NÃO sobre sono.' : '4 preguntas SÍ/NO sobre sueño.'}
+                            </p>
+                            <p class="font-semibold text-dark-blue">
+                                <strong>${t.interpretation}</strong> ${getSleepInterpretation()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Fatigue Scale Results -->
+                    <div class="bg-white border-l-4 border-yellow-500 p-3 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-dark-blue">${t.fatigueScale}</h4>
+                            <p class="text-xl font-bold text-yellow-600">${fatigueScore}/33</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs">
+                            <p class="text-gray-600 mb-1">
+                                <strong>${t.howItWorks}</strong>
+                                ${isPortuguese ? '11 perguntas, 0-3 pontos cada.' : '11 preguntas, 0-3 puntos cada.'}
+                            </p>
+                            <p class="font-semibold text-dark-blue">
+                                <strong>${t.interpretation}</strong> ${getFatigueInterpretation()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- AUDIT Results -->
+                    <div class="bg-white border-l-4 border-red-500 p-3 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-dark-blue">AUDIT</h4>
+                            <p class="text-xl font-bold text-red-600">${auditScore}/40</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs">
+                            <p class="text-gray-600 mb-1">
+                                <strong>${t.howItWorks}</strong>
+                                ${isPortuguese ? '10 perguntas, 0-4 pontos cada.' : '10 preguntas, 0-4 puntos cada.'}
+                            </p>
+                            <p class="font-semibold text-dark-blue">
+                                <strong>${t.interpretation}</strong> ${getAuditInterpretation()}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Phobias Results -->
+                    <div class="bg-white border-l-4 border-purple-500 p-3 rounded-lg shadow col-span-full">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-bold text-dark-blue">${t.phobiasAndFears}</h4>
+                            <p class="text-xl font-bold text-purple-600">${phobiaScore}/9</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs space-y-1">
+                            ${(() => {
+                                const phobiaDetails = [];
+                                const phobiaTexts = {
+                                    pt: [
+                                        'Histórico de fobia de altura informado. Considerar na avaliação de atividades em altura.',
+                                        'Histórico de fobia de ambientes confinados informado. Avaliar impacto em tarefas realizadas em espaços restritos.',
+                                        'Histórico de condição psiquiátrica informado. Recomenda-se acompanhamento profissional contínuo.',
+                                        'Histórico de uso contínuo de medicamentos informado. Monitorar efeitos e possíveis interferências nas atividades laborais.',
+                                        'Histórico de condição neurológica informado. Avaliação clínica é fundamental para definição de aptidão laboral.',
+                                        'Histórico de episódios de perda de consciência informado. Sugere-se investigação clínica aprofundada.',
+                                        '', // Question 7 - no specific text provided
+                                        '', // Question 8 - no specific text provided
+                                        'Relato de sintomas durante esforço físico. Avaliação médica pode ser necessária para afastar restrições clínicas.'
+                                    ],
+                                    es: [
+                                        'Historial de fobia a las alturas informado. Considerar en la evaluación de actividades en altura.',
+                                        'Historial de fobia a ambientes confinados informado. Evaluar impacto en tareas realizadas en espacios restringidos.',
+                                        'Historial de condición psiquiátrica informado. Se recomienda seguimiento profesional continuo.',
+                                        'Historial de uso continuo de medicamentos informado. Monitorear efectos y posibles interferencias en las actividades laborales.',
+                                        'Historial de condición neurológica informado. Evaluación clínica es fundamental para definición de aptitud laboral.',
+                                        'Historial de episodios de pérdida de conciencia informado. Se sugiere investigación clínica profunda.',
+                                        '', // Question 7 - no specific text provided
+                                        '', // Question 8 - no specific text provided
+                                        'Relato de síntomas durante esfuerzo físico. Evaluación médica puede ser necesaria para descartar restricciones clínicas.'
+                                    ]
+                                };
+                                
+                                for (let i = 0; i < 9; i++) {
+                                    const selected = document.querySelector(`input[name="phobia${i}"]:checked`);
+                                    if (selected && selected.value === '1') {
+                                        const text = phobiaTexts[currentLanguage][i];
+                                        if (text) {
+                                            phobiaDetails.push(`<p class="text-dark-blue"><strong>• ${translations[currentLanguage].phobiaQuestions[i]}</strong><br>${text}</p>`);
+                                        }
+                                    }
+                                }
+                                
+                                if (phobiaDetails.length === 0) {
+                                    return `<p class="font-semibold text-dark-blue">${isPortuguese ? 'Nenhum medo ou condição específica identificada.' : 'Ningún miedo o condición específica identificada.'}</p>`;
+                                }
+                                
+                                return phobiaDetails.join('');
+                            })()}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                        <button onclick="toggleHelpInfo()" id="help-btn" class="bg-vibrant-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition-all">
+                            ${t.sendResultButton}
+                        </button>
+                        
+                        <button onclick="toggleValidationInfo()" id="validation-btn" class="bg-dark-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-all">
+                            ${t.validationButton}
+                        </button>
+                    </div>
+                    
+                    <div id="help-info" class="hidden mt-3 bg-white p-3 rounded-lg shadow border-2 border-vibrant-green">
+                        <h4 class="text-sm font-bold text-dark-blue mb-2">${t.helpTitle}</h4>
+                        <p class="text-xs text-gray-700 mb-2">${t.helpDescription}</p>
+                        
+                        <div class="bg-gray-50 p-2 rounded text-xs">
+                            <div class="flex items-center space-x-1 mb-1">
+                                <span class="text-sm">👩‍⚕️</span>
+                                <span class="font-semibold text-dark-blue">Keli Pertille</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-1 mb-1">
+                                <span class="text-sm">📞</span>
+                                <span class="text-dark-blue">${t.whatsapp} (66) 98108-5335</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-1">
+                                <span class="text-sm">📧</span>
+                                <a href="mailto:kelicristina.pertille@bayer.com" class="text-capri-blue hover:text-vibrant-green font-semibold underline">
+                                    ${t.email} kelicristina.pertille@bayer.com
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="validation-info" class="hidden mt-3 bg-white p-3 rounded-lg shadow border-2 border-dark-blue">
+                        <h4 class="text-sm font-bold text-dark-blue mb-2">${t.validationTitle}</h4>
+                        <p class="text-xs text-gray-700 mb-3">${t.validationDescription}</p>
+                        
+                        <div class="bg-gray-50 p-3 rounded text-xs">
+                            <div class="flex items-center justify-center mb-3">
+                                <img src="https://i.imgur.com/b1SqbQD.jpeg" alt="Assinatura Dra. Natália Moro" class="max-w-full h-auto rounded border" style="max-height: 80px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display: none;" class="text-center text-gray-500 italic">
+                                    ${t.signatureNotAvailable}
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="font-semibold text-dark-blue mb-1">${t.doctorName}</p>
+                                <p class="text-gray-600 text-xs">${t.doctorTitle}</p>
+                                <p class="text-gray-600 text-xs">${t.companyName}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            console.log('Results HTML generated, showing modal...');
+            resultsModal.style.display = 'flex';
+            resultsModal.classList.remove('hidden');
+            console.log('Modal classes after removing hidden:', resultsModal.className);
+            console.log('Results modal should now be visible!');
+            
+            // Scroll to top of modal
+            setTimeout(() => {
+                const modalContent = resultsModal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.scrollTop = 0;
+                }
+            }, 100);
+        }
+
+        function closeResultsModal() {
+            const resultsModal = document.getElementById('results-modal');
+            resultsModal.classList.add('hidden');
+            resultsModal.style.display = 'none';
+        }
+
+        function downloadResults() {
+            const name = document.getElementById('name-input').value;
+            const birthDate = document.getElementById('birth-input').value;
+            const isPortuguese = currentLanguage === 'pt';
+            
+            // Calculate all scores again
+            let srqScore = 0;
+            for (let i = 0; i < 20; i++) {
+                const selected = document.querySelector(`input[name="srq${i}"]:checked`);
+                if (selected) srqScore += parseInt(selected.value);
+            }
+            
+            let sleepScore = 0;
+            for (let i = 0; i < 4; i++) {
+                const selected = document.querySelector(`input[name="sleep${i}"]:checked`);
+                if (selected) sleepScore += parseInt(selected.value);
+            }
+            
+            let fatigueScore = 0;
+            for (let i = 0; i < 11; i++) {
+                const selected = document.querySelector(`input[name="fatigue${i}"]:checked`);
+                if (selected) fatigueScore += parseInt(selected.value);
+            }
+            
+            let auditScore = 0;
+            for (let i = 0; i < 10; i++) {
+                const selected = document.querySelector(`input[name="audit${i}"]:checked`);
+                if (selected) auditScore += parseInt(selected.value);
+            }
+            
+            let phobiaScore = 0;
+            for (let i = 0; i < 9; i++) {
+                const selected = document.querySelector(`input[name="phobia${i}"]:checked`);
+                if (selected) phobiaScore += parseInt(selected.value);
+            }
+            
+            // Create text content for download
+            const content = `
+FICHA DE ACOMPANHAMENTO PSICOSSOCIAL
+=====================================
+
+DADOS DO PACIENTE:
+Nome: ${name}
+Data de Nascimento: ${birthDate}
+Data da Avaliação: ${new Date().toLocaleDateString(isPortuguese ? 'pt-BR' : 'es-ES')}
+
+RESULTADOS:
+-----------
+
+SRQ-20: ${srqScore}/20
+${srqScore >= 8 ? 
+    (isPortuguese ? 'Provável sofrimento mental. Recomenda-se avaliação mais detalhada.' : 'Probable sufrimiento mental. Se recomienda evaluación más detallada.') :
+    (isPortuguese ? 'Baixo risco de transtornos mentais comuns.' : 'Bajo riesgo de trastornos mentales comunes.')
+}
+
+QUALIDADE DO SONO: ${sleepScore}/4
+${sleepScore === 0 ? 
+    (isPortuguese ? 'Sono aparentemente regular e restaurador.' : 'Sueño aparentemente regular y reparador.') :
+    sleepScore >= 2 ? 
+        (isPortuguese ? 'Qualidade do sono insatisfatória. Requer atenção.' : 'Calidad del sueño insatisfactoria. Requiere atención.') :
+        (isPortuguese ? 'Padrão de sono com alguns aspectos a observar.' : 'Patrón de sueño con algunos aspectos a observar.')
+}
+
+ESCALA DE FADIGA (CHALDER): ${fatigueScore}/33
+${fatigueScore === 0 ? 
+    (isPortuguese ? 'Energia em dia! Nenhum sinal de fadiga percebido nas últimas semanas.' : '¡Energía al día! Ninguna señal de fatiga percibida en las últimas semanas.') :
+    fatigueScore >= 1 && fatigueScore <= 11 ? 
+        (isPortuguese ? 'Sem sinais relevantes de fadiga. Recomenda-se manter a observação da rotina e da qualidade do descanso.' : 'Sin señales relevantes de fatiga. Se recomienda mantener la observación de la rutina y la calidad del descanso.') :
+        fatigueScore >= 12 && fatigueScore <= 20 ? 
+            (isPortuguese ? 'Fadiga leve a moderada. É aconselhável revisar os hábitos de sono e incluir pausas ao longo do dia.' : 'Fatiga leve a moderada. Es aconsejable revisar los hábitos de sueño e incluir pausas a lo largo del día.') :
+            (isPortuguese ? 'Atenção! Indícios de fadiga intensa. Sugere-se avaliação clínica e busca por suporte especializado.' : '¡Atención! Indicios de fatiga intensa. Se sugiere evaluación clínica y búsqueda de apoyo especializado.')
+}
+
+AUDIT: ${auditScore}/40
+${auditScore === 0 ? 
+    (isPortuguese ? 'Ausência de consumo de álcool ou abstinência.' : 'Ausencia de consumo de alcohol o abstinencia.') :
+    auditScore <= 7 ? 
+        (isPortuguese ? 'Uso de baixo risco.' : 'Uso de bajo riesgo.') :
+        auditScore <= 15 ? 
+            (isPortuguese ? 'Uso de risco. Recomenda-se avaliação mais detalhada.' : 'Uso de riesgo. Se recomienda evaluación más detallada.') :
+            (isPortuguese ? 'Uso nocivo/possível dependência. Recomenda-se avaliação mais detalhada.' : 'Uso nocivo/posible dependencia. Se recomienda evaluación más detallada.')
+}
+
+FOBIAS E MEDOS: ${phobiaScore}/9
+${phobiaScore === 0 ? 
+    (isPortuguese ? 'Nenhum medo ou condição específica identificada.' : 'Ningún miedo o condición específica identificada.') :
+    (isPortuguese ? 'Condições específicas identificadas que requerem atenção.' : 'Condiciones específicas identificadas que requieren atención.')
+}
+
+=====================================
+Relatório gerado automaticamente
+Bayer - Saúde Ocupacional
+            `;
+            
+            // Create and download file
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Resultado_Psicossocial_${name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleHelpInfo() {
+            const helpInfo = document.getElementById('help-info');
+            const helpBtn = document.getElementById('help-btn');
+            const validationInfo = document.getElementById('validation-info');
+            const t = translations[currentLanguage];
+            
+            // Close validation info if open
+            if (!validationInfo.classList.contains('hidden')) {
+                validationInfo.classList.add('hidden');
+                document.getElementById('validation-btn').textContent = t.validationButton;
+            }
+            
+            if (helpInfo.classList.contains('hidden')) {
+                helpInfo.classList.remove('hidden');
+                helpBtn.textContent = t.hideContactButton;
+            } else {
+                helpInfo.classList.add('hidden');
+                helpBtn.textContent = t.sendResultButton;
+            }
+        }
+
+        function toggleValidationInfo() {
+            const validationInfo = document.getElementById('validation-info');
+            const validationBtn = document.getElementById('validation-btn');
+            const helpInfo = document.getElementById('help-info');
+            const t = translations[currentLanguage];
+            
+            // Close help info if open
+            if (!helpInfo.classList.contains('hidden')) {
+                helpInfo.classList.add('hidden');
+                document.getElementById('help-btn').textContent = t.sendResultButton;
+            }
+            
+            if (validationInfo.classList.contains('hidden')) {
+                validationInfo.classList.remove('hidden');
+                validationBtn.innerHTML = currentLanguage === 'pt' ? '📋 Ocultar Validação' : '📋 Ocultar Validación';
+            } else {
+                validationInfo.classList.add('hidden');
+                validationBtn.innerHTML = t.validationButton;
+            }
+        }
+
+        // Fix validation button text in results
+        function updateValidationButtonInResults() {
+            const validationBtn = document.getElementById('validation-btn');
+            if (validationBtn) {
+                const t = translations[currentLanguage];
+                validationBtn.innerHTML = t.validationButton;
+            }
+        }
+
+        // Initialize the page
+        updateContent();
+        updateNavigationButtons();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0168cf1a8a32878',t:'MTc3OTczMzE4OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
